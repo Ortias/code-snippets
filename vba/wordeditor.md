@@ -15,6 +15,46 @@ Sub ProcessWaitTime(time As Long)
     Loop While [Now()] * 86400000 < startTime + time
 End Sub
 
+'===========================================================================
+' クリップボード検証付き安全貼り付け関数
+' doc     : Outlook WordEditor オブジェクト
+' waitMs  : Copy後の初回待機時間(ms)。デフォルト200ms推奨
+' 戻り値  : 成功=True / 失敗=False
+'===========================================================================
+Private Function SafePasteToDoc(doc As Object, _
+                                Optional waitMs As Long = 200) As Boolean
+    Dim retryCount As Integer
+    Dim waitTime   As Long
+    Dim cbAvail    As Boolean
+    
+    waitTime = waitMs
+    SafePasteToDoc = False
+    
+    For retryCount = 1 To RETRY_NUM
+        ' クリップボードが有効かチェック
+        On Error Resume Next
+        cbAvail = (UBound(Application.ClipboardFormats) >= 0)
+        On Error GoTo 0
+        
+        If cbAvail Then
+            On Error Resume Next
+            doc.Windows(1).Selection.Paste
+            If Err.Number = 0 Then
+                SafePasteToDoc = True
+                Exit For
+            End If
+            Err.Clear
+            On Error GoTo 0
+        End If
+        
+        ' 失敗した場合: DoEvents + 待機してリトライ
+        DoEvents
+        ProcessWaitTime waitTime
+        waitTime = waitTime + 100   ' 毎回100msずつ待機を延長
+    Next retryCount
+End Function
+
+
 Public Sub CreatedailyMail()
 
     Dim olApp As Outlook.Application
