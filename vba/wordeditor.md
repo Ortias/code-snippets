@@ -137,7 +137,16 @@ wdRange.Collapse wdCollapseEnd
 wdRange.Paste
 wdRange.Collapse wdCollapseEnd
 
-' リンク挿入
+' Wordとして操作可能
+wdRange.InsertAfter "Hello from Inspector!" & vbCrLf
+wdRange.Collapse wdCollapseEnd ' 次の追記のために文末へ
+
+startPos = wdRange.End  ' 追加前の位置を保存
+wdRange.InsertAfter "リンクはこちらから"
+Set wdRange = wdDoc.Range(startPos, wdDoc.Range.End)
+wdRange.Font.Color = RGB(0, 0, 255)
+wdRange.Collapse wdCollapseEnd
+
 startPos = wdRange.End
 wdRange.InsertAfter "▼ 詳細はこちら"
 Set wdRange = wdDoc.Range(startPos, wdDoc.Range.End)
@@ -146,13 +155,12 @@ wdDoc.Hyperlinks.Add _
     Anchor:=wdRange, _
     Address:="https://www.example.com"
 
-' 通常文字
-wdRange.Collapse wdCollapseEnd
 startPos = wdRange.End
-wdRange.InsertAfter vbCrLf & "ご不明点があればご連絡ください。"
+wdRange.InsertAfter vbCrLf & "続けてみる。" & vbCrLf
 Set wdRange = wdDoc.Range(startPos, wdDoc.Range.End)
 wdRange.Font.Color = wdColorAutomatic ' 既定色（黒）
 wdRange.Collapse wdCollapseEnd
+
 
 ```
 
