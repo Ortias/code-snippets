@@ -148,7 +148,12 @@ wdDoc.Hyperlinks.Add _
 
 ' 通常文字
 wdRange.Collapse wdCollapseEnd
+startPos = wdRange.End
 wdRange.InsertAfter vbCrLf & "ご不明点があればご連絡ください。"
+Set wdRange = wdDoc.Range(startPos, wdDoc.Range.End)
+wdRange.Font.Color = wdColorAutomatic ' 既定色（黒）
+wdRange.Collapse wdCollapseEnd
+
 ```
 
 ### グラフを画像として貼る（軽量）
